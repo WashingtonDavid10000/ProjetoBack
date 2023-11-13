@@ -20,7 +20,6 @@ export async function store(req, res) {
 
 export async function update(req, res) {
   try {
-    console.log(req.body);
     const tasks = await taskModel.updadeTask(req.userEmail, {
       oldTask: req.body.oldTask,
       newTask: req.body.newTask,
@@ -33,7 +32,6 @@ export async function update(req, res) {
 
 export async function remove(req, res) {
   try {
-    console.log(req.body);
     const tasks = await taskModel.deleteTask(req.userEmail, { deleteTask: req.body.deleteTask });
     res.json(tasks);
   } catch (e) {

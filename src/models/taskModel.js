@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 const taskSchema = new Schema({
-  nome: { type: String },
+  nome: { type: String, required: true, unique: true },
   text: { type: String, required: true },
 });
 
@@ -25,8 +25,12 @@ class TaskModel {
   // async taskExist(){
   // }
 
+  verificaObjetoVazio(obj) {
+    return Object.keys(obj).length === 0;
+  }
+
   async getTasks(email) {
-    this.errros = [];
+    this.errors = [];
     const tasks = await this.tasksExists(email);
 
     if (!tasks) {
@@ -41,13 +45,19 @@ class TaskModel {
     this.errors = [];
     // Tasks(OBJ) com email e tasks
     const tasksUser = await this.tasksExists(email);
-    // O array de Tasks
-    const tasks = [...tasksUser.tasks];
+
+    if (this.verificaObjetoVazio(newTask)) {
+      this.errors.push('Tarefa inválida');
+      throw this.errors;
+    }
 
     if (!tasksUser) {
       const tasksCriadas = await tasksModel.create({ email, tasks: newTask });
       return tasksCriadas;
     }
+
+    // O array de Tasks
+    const tasks = [...tasksUser.tasks];
 
     const found = tasks.find((task) => task.nome === newTask.nome);
 
@@ -63,7 +73,7 @@ class TaskModel {
   }
 
   async updadeTask(email, { oldTask, newTask }) {
-    this.errros = [];
+    this.errors = [];
 
     // Tasks(OBJ) com email e tasks
     const tasksUser = await this.tasksExists(email);
@@ -73,6 +83,16 @@ class TaskModel {
 
     if (!tasksUser) {
       this.errors.push("Não há tarefas criadas");
+      throw this.errors;
+    }
+
+    if (!oldTask || this.verificaObjetoVazio(oldTask)) {
+      this.errors.push("Task não pôde ser alterada, verifique se há erros");
+      throw this.errors;
+    }
+
+    if (!newTask || this.verificaObjetoVazio(newTask)) {
+      this.errors.push("A mudança na task não foi realizada, verifique se há erros");
       throw this.errors;
     }
 
@@ -97,7 +117,7 @@ class TaskModel {
   }
 
   async deleteTask(email, { deleteTask }) {
-    this.errros = [];
+    this.errors = [];
 
     // Tasks(OBJ) com email e tasks
     const tasksUser = await this.tasksExists(email);
@@ -107,6 +127,11 @@ class TaskModel {
 
     if (!tasksUser) {
       this.errors.push("Não há tarefas criadas");
+      throw this.errors;
+    }
+
+    if (this.verificaObjetoVazio(deleteTask)) {
+      this.errors.push("Task enviada é inválida, ou não existe");
       throw this.errors;
     }
 
@@ -124,7 +149,7 @@ class TaskModel {
       throw this.errors;
     }
 
-    const newTask = [...tasks.slice(0, found), ...tasks.slice(found + 1, tasks.length - 1)];
+    const newTask = [...tasks.slice(0, found), ...tasks.slice(found + 1, tasks.length)];
 
     const tasksCriadas = await tasksModel.findOneAndUpdate(
       { email },
