@@ -149,7 +149,7 @@ class TaskModel {
       throw this.errors;
     }
 
-    const newTask = [...tasks.slice(0, found), ...tasks.slice(found + 1, tasks.length - 1)];
+    const newTask = [...tasks.slice(0, found), ...tasks.slice(found + 1, tasks.length)];
 
     const tasksCriadas = await tasksModel.findOneAndUpdate(
       { email },
