@@ -46,7 +46,7 @@ class TaskModel {
     // Tasks(OBJ) com email e tasks
     const tasksUser = await this.tasksExists(email);
 
-    if (this.verificaObjetoVazio(newTask)) {
+    if (!newTask || this.verificaObjetoVazio(newTask)) {
       this.errors.push('Tarefa inválida');
       throw this.errors;
     }
@@ -81,7 +81,7 @@ class TaskModel {
     // O array de Tasks
     const tasks = [...tasksUser.tasks];
 
-    if (!tasksUser) {
+    if (!tasksUser || this.verificaObjetoVazio(tasks)) {
       this.errors.push("Não há tarefas criadas");
       throw this.errors;
     }
@@ -125,12 +125,12 @@ class TaskModel {
     // O array de Tasks
     const tasks = [...tasksUser.tasks];
 
-    if (!tasksUser) {
+    if (!tasksUser || this.verificaObjetoVazio(tasks)) {
       this.errors.push("Não há tarefas criadas");
       throw this.errors;
     }
 
-    if (this.verificaObjetoVazio(deleteTask)) {
+    if (!deleteTask || this.verificaObjetoVazio(deleteTask)) {
       this.errors.push("Task enviada é inválida, ou não existe");
       throw this.errors;
     }
